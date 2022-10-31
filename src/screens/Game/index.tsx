@@ -1,23 +1,30 @@
-import { useEffect, useState } from 'react';
-import { View, TouchableOpacity, Image, FlatList, Text } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRoute, useNavigation } from '@react-navigation/native';
-import { Background } from '../../components/Background';
-import {Entypo} from '@expo/vector-icons';
-import logoImg from '../../assets/logo-nlw-esports.png';
-import { styles } from './styles';
-import { GameParams } from '../../@types/navigation';
-import { THEME } from '../../theme';
-import { Heading } from '../../components/Heading';
-import { DuoCard, DuoCardProps } from '../../components/DuoCard';
-import { BASE_URL } from '../../screens/Home';
-import { DuoMatch } from '../../components/DuoMatch';
-
+import { useEffect, useState } from "react";
+import {
+  View,
+  TouchableOpacity,
+  Image,
+  FlatList,
+  Text,
+  ActivityIndicator,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useRoute, useNavigation } from "@react-navigation/native";
+import { Background } from "../../components/Background";
+import { Entypo } from "@expo/vector-icons";
+import logoImg from "../../assets/logo-nlw-esports.png";
+import { styles } from "./styles";
+import { GameParams } from "../../@types/navigation";
+import { THEME } from "../../theme";
+import { Heading } from "../../components/Heading";
+import { DuoCard, DuoCardProps } from "../../components/DuoCard";
+import { BASE_URL } from "../../screens/Home";
+import { DuoMatch } from "../../components/DuoMatch";
 
 export function Game() {
-
   const [duos, setDuos] = useState<DuoCardProps[]>([]);
-  const [discordDuoSelected, setDiscordDuoSelected] = useState('');
+  const [discordDuoSelected, setDiscordDuoSelected] = useState("");
+
+  const [isLoading, setIsLoading] = useState(true);
 
   const navigation = useNavigation();
   const route = useRoute();
@@ -28,78 +35,78 @@ export function Game() {
   }
 
   async function getDiscordUser(adsId: string) {
-    fetch(`http://192.168.15.5:3333/ads/${adsId}/discord`)
-      .then(res => res.json())
-      .then(data => setDiscordDuoSelected(data.discord));
+    fetch(`${BASE_URL}/ads/${adsId}/discord`)
+      .then((res) => res.json())
+      .then((data) => setDiscordDuoSelected(data.discord));
   }
 
-  
-useEffect(() => {
-    fetch(`${BASE_URL}/${game.id}/ads`)
-      .then(res => res.json())
-      .then(data => setDuos(data))
-  }, []); 
+  useEffect(() => {
+    fetch(`${BASE_URL}/games/${game.id}/ads`)
+      .then((res) => res.json())
+      .then((data) => {
+        setDuos(data);
+        setIsLoading(false);
+      });
+  }, []);
 
   return (
     <Background>
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={handleGoBack}>
-            <Entypo 
-              name='chevron-thin-left'
+            <Entypo
+              name="chevron-thin-left"
               color={THEME.COLORS.CAPTION_300}
               size={20}
             />
-
           </TouchableOpacity>
 
-          <Image 
-            source={logoImg}
-            style={styles.logo}
-          />
+          <Image source={logoImg} style={styles.logo} />
 
-          <View style={styles.right}/> 
+          <View style={styles.right} />
         </View>
 
-        <Image 
+        <Image
           source={{ uri: game.bannerUrl }}
           style={styles.cover}
           resizeMode="cover"
         />
 
-        <Heading 
-          title={game.title}
-          subtitle="Conecte-se e comece a jogar!"
-        />
+        <Heading title={game.title} subtitle="Conecte-se e comece a jogar!" />
 
-        <FlatList
-          data={duos}
-          keyExtractor={item => item.id}
-          renderItem={
-            ({item}) => (
-              <DuoCard 
-              data={item} 
-              onConnect={() => {getDiscordUser(item.id)}}
+        {isLoading ? (
+          <ActivityIndicator color={THEME.COLORS.PRIMARY} />
+        ) : (
+          <FlatList
+            data={duos}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <DuoCard
+                data={item}
+                onConnect={() => {
+                  getDiscordUser(item.id);
+                }}
               />
-            )
-          }
-          horizontal
-          style={styles.containerList}
-          contentContainerStyle={[duos.length > 0 ? styles.contentList : styles.emptyListContent]}
-          showsHorizontalScrollIndicator={false}
-          ListEmptyComponent={() => (
-            <Text style={styles.emptyListText}>
-              Não há anúncios publicados ainda...
-            </Text>
-          )}
-        />
-        
-        <DuoMatch 
+            )}
+            horizontal
+            style={styles.containerList}
+            contentContainerStyle={[
+              duos.length > 0 ? styles.contentList : styles.emptyListContent,
+            ]}
+            showsHorizontalScrollIndicator={false}
+            ListEmptyComponent={() => (
+              <Text style={styles.emptyListText}>
+                Não há anúncios publicados ainda...
+              </Text>
+            )}
+          />
+        )}
+
+        <DuoMatch
           visible={discordDuoSelected.length > 0}
           discord={discordDuoSelected}
-          onClose={() => setDiscordDuoSelected('')}
+          onClose={() => setDiscordDuoSelected("")}
         />
-
       </SafeAreaView>
     </Background>
   );
