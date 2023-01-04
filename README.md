@@ -155,7 +155,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 [license-shield]: https://img.shields.io/github/license/LeAmSa/nlw-esports-web?style=for-the-badge
 [license-url]: https://github.com/LeAmSa/nlw-esports-web/blob/main/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://www.linkedin.com/in/leandroamorimsalles1994
+[linkedin-url]: https://www.linkedin.com/in/leamsa
 [git-url]: https://git-scm.com/
 [nodejs-url]: https://nodejs.org/en/
 [vscode-url]: https://code.visualstudio.com/
